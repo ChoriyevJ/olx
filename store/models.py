@@ -36,7 +36,7 @@ class Photo(utils_models.BaseModel):
 class Category(utils_models.BaseModel):
     title = models.CharField(max_length=255)
     parent = models.ForeignKey('self', on_delete=models.CASCADE,
-                               related_name='children')
+                               related_name='children', blank=True)
     # using for filter
     # subcategories_json = models.JSONField(blank=True, null=True)
     is_subcategory = models.BooleanField(default=False)

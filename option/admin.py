@@ -1,3 +1,26 @@
 from django.contrib import admin
 
-# Register your models here.
+from option import models
+
+
+@admin.register(models.Option)
+class OptionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.OptionValue)
+class OptionValueAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.CategoryOption)
+class CategoryOptionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.PostOption)
+class PostOptionAdmin(admin.ModelAdmin):
+    pass
+
+
+

@@ -76,7 +76,7 @@ CELERY_TASK_EAGER_PROPAGATES = True
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": 'olx',
         "USER": "olx",
         "PASSWORD": "olx",
