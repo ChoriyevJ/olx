@@ -41,7 +41,7 @@ class Category(utils_models.BaseModel):
     subcategories = models.JSONField(blank=True, null=True)
     is_subcategory = models.BooleanField(default=False)
 
-    # other
+    # fields for price
     is_price = models.BooleanField(default=False)
     is_free = models.BooleanField(default=False)
     is_exchange = models.BooleanField(default=False)
@@ -52,6 +52,8 @@ class Category(utils_models.BaseModel):
 
 class SubCategory(utils_models.BaseModel):
     title = models.CharField(max_length=255)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE,
+                                 related_name='subcategories')
 
     def __str__(self):
         return self.title
