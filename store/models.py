@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.validators import FileExtensionValidator
 
 from utils import models as utils_models
 
@@ -87,6 +88,8 @@ class Post(utils_models.BaseModel):
                                              related_name="recently_posts", blank=True)
 
     # contact
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             related_name='posts', blank=True, null=True)
     address = models.ForeignKey(District, on_delete=models.CASCADE,
                                 related_name='posts')
     email = models.EmailField(default='')
@@ -99,6 +102,21 @@ class Post(utils_models.BaseModel):
 
     def __str__(self):
         return self.title
+
+
+class Message(utils_models.BaseModel):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE,
+                             related_name='messages')
+    owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                              related_name='messages', blank=True, null=True)
+    content = models.CharField(max_length=511)
+    file = models.FileField(upload_to='files/', blank=True, null=True,
+                            validators=[FileExtensionValidator(['pdf', 'doc', 'docx', 'png', 'jpeg'])])
+    image = models.ImageField(upload_to='images/', blank=True, null=True)
+
+    def __str__(self):
+        return f"Message: {self.post}, from {self.owner}"
+
 
 
 
