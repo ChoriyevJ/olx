@@ -67,9 +67,22 @@ CELERY_TASK_EAGER_PROPAGATES = True
 # Your stuff...
 # ------------------------------------------------------------------------------
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",  # noqa
+#     }
+# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",  # noqa
+        "NAME": 'olx',
+        "USER": "olx",
+        "PASSWORD": "olx",
+        "PORT": "5432",
+        "HOST": "localhost"
     }
 }
+
+
