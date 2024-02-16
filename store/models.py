@@ -38,7 +38,7 @@ class Category(utils_models.BaseModel):
     parent = models.ForeignKey('self', on_delete=models.CASCADE,
                                related_name='children')
     # using for filter
-    subcategories_json = models.JSONField(blank=True, null=True)
+    # subcategories_json = models.JSONField(blank=True, null=True)
     is_subcategory = models.BooleanField(default=False)
 
     # fields for price
