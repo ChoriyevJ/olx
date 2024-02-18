@@ -13,11 +13,6 @@ class OptionValueAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(models.CategoryOption)
-class CategoryOptionAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(models.PostOption)
 class PostOptionAdmin(admin.ModelAdmin):
     pass

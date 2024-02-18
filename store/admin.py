@@ -30,5 +30,14 @@ class SubCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(models.Post)
 class PostAdmin(admin.ModelAdmin):
+    list_display = ["title", 'main_photo']
+
+
+@admin.register(models.Chat)
+class ChatAdmin(admin.ModelAdmin):
     pass
 
+
+@admin.register(models.Message)
+class MessageAdmin(admin.ModelAdmin):
+    pass

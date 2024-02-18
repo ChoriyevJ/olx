@@ -2,17 +2,18 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
 
-from utils import models as utils_models
+from utils.models import BaseModel
+from utils.choices import PriceTypeChoice, ValutaChoice
 
 
-class Region(utils_models.BaseModel):
+class Region(BaseModel):
     title = models.CharField(max_length=31)
 
     def __str__(self):
         return self.title
 
 
-class District(utils_models.BaseModel):
+class District(BaseModel):
     title = models.CharField(max_length=31)
     region = models.ForeignKey(Region, on_delete=models.CASCADE,
                                related_name='districts')
@@ -21,7 +22,7 @@ class District(utils_models.BaseModel):
         return f'{self.title} {self.region}'
 
 
-class Photo(utils_models.BaseModel):
+class Photo(BaseModel):
     image = models.ImageField(upload_to='images/')
     post = models.ForeignKey('Post', on_delete=models.CASCADE,
                              related_name='photos')
@@ -33,13 +34,20 @@ class Photo(utils_models.BaseModel):
     def __str__(self):
         return f'{self.post} - {self.image}'
 
+    def save(self, *args, **kwargs):
+        if self.is_main is True:
+            self.post.main_photo = self.image
+            self.post.save()
+        super().save(*args, **kwargs)
 
-class Category(utils_models.BaseModel):
+
+class Category(BaseModel):
     title = models.CharField(max_length=255)
     parent = models.ForeignKey('self', on_delete=models.CASCADE,
-                               related_name='children', blank=True)
-    # using for filter
-    # subcategories_json = models.JSONField(blank=True, null=True)
+                               related_name='children', blank=True, null=True)
+    options = models.ManyToManyField("option.Option", blank=True,
+                                     related_name="categories")
+    image = models.ImageField(upload_to='images/category/', null=True, blank=True)
     is_subcategory = models.BooleanField(default=False)
 
     # fields for price
@@ -51,16 +59,18 @@ class Category(utils_models.BaseModel):
         return self.title
 
 
-class SubCategory(utils_models.BaseModel):
+class SubCategory(BaseModel):
     title = models.CharField(max_length=255)
     category = models.ForeignKey(Category, on_delete=models.CASCADE,
                                  related_name='subcategories')
+    options = models.ManyToManyField("option.Option",
+                                     related_name='subcategories', blank=True)
 
     def __str__(self):
         return self.title
 
 
-class Post(utils_models.BaseModel):
+class Post(BaseModel):
     title = models.CharField(max_length=255)
     # field for category
     category = models.ForeignKey(Category, on_delete=models.CASCADE,
@@ -72,20 +82,22 @@ class Post(utils_models.BaseModel):
     main_photo = models.ImageField(upload_to='images/', null=True, blank=True)
 
     # fields for price
-    price_type = models.CharField(max_length=10, choices=utils_models.PriceTypeChoice.choices,
-                                  default=utils_models.PriceTypeChoice.PRICE, blank=True, null=True)
+    price_type = models.CharField(max_length=10, choices=PriceTypeChoice.choices,
+                                  default=PriceTypeChoice.PRICE, blank=True, null=True)
     price = models.PositiveSmallIntegerField(null=True, blank=True)
-    valuta_type = models.CharField(max_length=10, choices=utils_models.ValutaChoice.choices,
-                                   default=utils_models.ValutaChoice.SUM, null=True, blank=True)
+    valuta_type = models.CharField(max_length=10, choices=ValutaChoice.choices,
+                                   default=ValutaChoice.SUM, null=True, blank=True)
     is_trade = models.BooleanField(default=False, null=True, blank=True)
+
+    # options
+    options = models.ManyToManyField("option.Option", blank=True,
+                                     through="option.PostOption")
 
     # favorites
     favorites = models.ManyToManyField(get_user_model(),
                                        related_name="favorite_posts", blank=True)
     saved_searches = models.ManyToManyField(get_user_model(),
                                             related_name="saved_posts", blank=True)
-    recently_viewed = models.ManyToManyField(get_user_model(),
-                                             related_name="recently_posts", blank=True)
 
     # contact
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
@@ -104,19 +116,27 @@ class Post(utils_models.BaseModel):
         return self.title
 
 
-class Message(utils_models.BaseModel):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE,
-                             related_name='messages')
-    owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
-                              related_name='messages', blank=True, null=True)
-    content = models.CharField(max_length=511)
-    file = models.FileField(upload_to='files/', blank=True, null=True,
-                            validators=[FileExtensionValidator(['pdf', 'doc', 'docx', 'png', 'jpeg'])])
-    image = models.ImageField(upload_to='images/', blank=True, null=True)
+class Chat(BaseModel):
+    seller = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                               related_name='buyyers')
+    buyyer = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                               related_name='sellers')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Message: {self.post}, from {self.owner}"
+        return f'buyer: {self.buyyer}, seller: {self.seller}'
 
+
+class Message(BaseModel):
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
+    sender = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    content = models.CharField(max_length=1000)
+    file = models.FileField(upload_to='files/', validators=[
+        FileExtensionValidator(['png', 'jpeg', 'pdf', 'docx', 'txt'])
+    ])
+
+    def __str__(self):
+        return f'Message(pk={self.pk})'
 
 
 
