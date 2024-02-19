@@ -31,9 +31,10 @@ class OptionValue(BaseModel):
 
 
 class PostOption(BaseModel):
-    post = models.ForeignKey("store.Post", on_delete=models.CASCADE)
+    post = models.ForeignKey("store.Post", on_delete=models.CASCADE, related_name='post_options')
     option = models.ForeignKey(Option, on_delete=models.CASCADE)
-    value = models.CharField(max_length=255)
+    value = models.CharField(max_length=255, blank=True, null=True)
+    option_values = models.ManyToManyField(OptionValue, through="PostOptionValue")
 
     def __str__(self):
         return f"{self.post}__{self.option}"
@@ -41,9 +42,9 @@ class PostOption(BaseModel):
 
 class PostOptionValue(BaseModel):
     post_option = models.ForeignKey(PostOption, on_delete=models.CASCADE)
-    value = models.CharField(max_length=255)
+    option_value = models.ForeignKey(OptionValue, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.value
+        return f'{self.post_option}__{self.option_value}'
 
 

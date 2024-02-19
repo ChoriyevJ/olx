@@ -18,4 +18,9 @@ class PostOptionAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(models.PostOptionValue)
+class PostOptionValueAdmin(admin.ModelAdmin):
+    pass
+
+
 

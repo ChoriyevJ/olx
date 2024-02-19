@@ -19,3 +19,17 @@ class OptionType(models.TextChoices):
     TEXT = "TEXT", "Text"
     NUMBER = "NUMBER", "Number"
     MULTIPLE_CHOICE = "MULTIPLE_CHOICE", "Multiple choice"
+
+
+class StatusChoice(models.TextChoices):
+    ACTIVE = 'ACTIVE', 'Active'
+    WAITING = 'WAITING', 'Waiting'
+    NOTACTIVE = 'NOTACTIVE', 'Not active'
+    NOTPAID = 'NOTPAID', 'Not paid'
+    DEACTIVED = 'DEACTIVED', 'Deactived'
+
+
+
+
+
+

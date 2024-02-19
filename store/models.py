@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
 
 from utils.models import BaseModel
-from utils.choices import PriceTypeChoice, ValutaChoice
+from utils.choices import PriceTypeChoice, ValutaChoice, StatusChoice
 
 
 class Region(BaseModel):
@@ -63,8 +63,8 @@ class SubCategory(BaseModel):
     title = models.CharField(max_length=255)
     category = models.ForeignKey(Category, on_delete=models.CASCADE,
                                  related_name='subcategories')
-    options = models.ManyToManyField("option.Option",
-                                     related_name='subcategories', blank=True)
+    option_values = models.ManyToManyField("option.OptionValue",
+                                           related_name='subcategories', blank=True)
 
     def __str__(self):
         return self.title
@@ -96,8 +96,6 @@ class Post(BaseModel):
     # favorites
     favorites = models.ManyToManyField(get_user_model(),
                                        related_name="favorite_posts", blank=True)
-    saved_searches = models.ManyToManyField(get_user_model(),
-                                            related_name="saved_posts", blank=True)
 
     # contact
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
@@ -108,12 +106,32 @@ class Post(BaseModel):
     phone_number = models.CharField(max_length=13)
 
     # others
+    status = models.CharField(max_length=15, choices=StatusChoice.choices,
+                              default=StatusChoice.ACTIVE)
     views = models.PositiveIntegerField(default=0, editable=False)
     auto_active = models.BooleanField(default=False)
     is_published = models.BooleanField(default=True)
 
     def __str__(self):
         return self.title
+
+
+class PostsRecently(BaseModel):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.post}__{self.user}'
+
+
+class SavedSearches(BaseModel):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    search = models.CharField(max_length=255)
+    info = models.CharField(max_length=255, blank=True, null=True)
+    is_send = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'{self.user}--{self.search}'
 
 
 class Chat(BaseModel):
